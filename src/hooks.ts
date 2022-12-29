@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, CSSProperties} from 'react'
 
 export interface AnimatedScaleProps {
     scale : number, 
@@ -63,5 +63,32 @@ export const useDimension : UDType = () : DimensionProps => {
     return {
         w, 
         h
+    }
+}
+
+export interface CustomStyleProps {
+    barStyle : (i : number) => CSSProperties
+}
+
+export type USType = (a : number, b : number, c : number, d : number) => CustomStyleProps 
+
+export const useStyle : USType = (w : number, h : number, scale : number, n : number) : CustomStyleProps => {
+    const sf : number = Math.min(scale * Math.PI)
+    const size : number = Math.min(w, h) / 10
+    const background : string = "#42a5f5"
+    return {
+        barStyle(i : number) : CSSProperties {
+            const top : string = `${size * n * 0.5 - i * size * 0.5}px`
+            const left : string = `${(w - size) * sf}px`
+            const width = `${size}px`
+            const height = `${size / 2}px`
+            return {
+                background, 
+                width, 
+                height, 
+                top, 
+                left 
+            }
+        }
     }
 }
