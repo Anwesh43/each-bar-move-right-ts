@@ -1,8 +1,10 @@
-import {useState, useEffect, CSSProperties} from 'react'
+import {useState, useEffect, CSSProperties, useCallback} from 'react'
 
+const SIZE_FACTOR : number = 7 
 export interface AnimatedScaleProps {
     scale : number, 
-    start : () => void 
+    start : () => void, 
+    i : number 
 }
 
 type UASProps = (a : number, b : number, c : number) => AnimatedScaleProps 
@@ -12,8 +14,11 @@ export const useAnimatedScale : UASProps = (scGap : number = 0.01, delay : numbe
     const [animated, setAnimated] = useState<boolean>(false)
     const [i, setI] = useState<number>(0)
     const [dir, setDir] = useState<number>(1)
+    const updateI = useCallback(setI, [scale])
+    const updateDir = useCallback(setDir, [dir])
     return {
         scale, 
+        i, 
         start() {
             if (!animated) {
                 setAnimated(true)
@@ -22,17 +27,15 @@ export const useAnimatedScale : UASProps = (scGap : number = 0.01, delay : numbe
                         if (prev > 1) {
                             setAnimated(false)
                             clearInterval(interval)
-                            setI((prevI : number) : number => {
-                                if (prevI === n) {
-                                    setDir(-1)
-                                    return n - 1
-                                }
-                                if (prevI == 0) {
-                                    setDir(1)
-                                    return 1 
-                                }
-                                return prevI + dir 
-                            })
+                            if (i == n - 1 && dir == 1) {
+                                updateI(n - 1)
+                                updateDir(-1)
+                            } else if (i == 0 && dir == -1) {
+                                updateI(0)
+                                updateDir(1)
+                            } else {
+                                updateI(i + dir)
+                            }
                             return 0 
                         }
                         return prev + scGap 
@@ -71,17 +74,17 @@ export interface CustomStyleProps {
     parentStyle : () => CSSProperties
 }
 
-export type USType = (a : number, b : number, c : number, d : number) => CustomStyleProps 
+export type USType = (a : number, b : number, c : number, d : number, e : number) => CustomStyleProps 
 
-export const useStyle : USType = (w : number, h : number, scale : number, n : number) : CustomStyleProps => {
-    const sf : number = Math.min(scale * Math.PI)
-    const size : number = Math.min(w, h) / 10
+export const useStyle : USType = (w : number, h : number, scale : number, n : number, mainI : number) : CustomStyleProps => {
+    const sf : number = Math.sin(scale * Math.PI)
+    const size : number = Math.min(w, h) / SIZE_FACTOR
     const background : string = "#42a5f5"
     const position = 'absolute'
     return {
         parentStyle() : CSSProperties {
             const top = `${h / 2}px`
-            const left = `${w / 2}px`
+            const left = `${0}px`
             return {
                 position, 
                 top, 
@@ -89,8 +92,8 @@ export const useStyle : USType = (w : number, h : number, scale : number, n : nu
             }
         },
         barStyle(i : number) : CSSProperties {
-            const top : string = `${size * n * 0.5 - i * size * 0.5}px`
-            const left : string = `${(w - size) * sf}px`
+            const top : string = `${-size * (n - 1) * 0.5 + i * size * 0.5}px`
+            const left : string = `${(w - size) * sf * (i == mainI ? 1 : 0)}px`
             const width = `${size}px`
             const height = `${size / 2}px`
             return {

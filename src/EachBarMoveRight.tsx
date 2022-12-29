@@ -19,11 +19,15 @@ const getArr = (n : number) : Array<number> => {
 }
 
 const EachBarMoveRight : React.FC<MainComponentProps> = (props : MainComponentProps) => {
-    const { barStyle, parentStyle } = useStyle(props.w || 0, props.h || 0, props.scale || 0, props.n)
+    const { barStyle, parentStyle } = useStyle(props.w || 0, props.h || 0, props.scale || 0, props.n, props.i ?? -1)
     const arr : Array<number> = getArr(props.n)
 
     return (
-        <div style = {parentStyle()}>
+        <div style = {parentStyle()} onClick = {() => {
+            if (props.onClick) {
+                props.onClick()
+            }
+        }}>
             {arr.map((i : number) => (<Bar barStyle = {barStyle} i = {i} key = {`bar_${i}`}/>))}
         </div>
     )   
