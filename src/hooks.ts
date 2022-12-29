@@ -67,7 +67,8 @@ export const useDimension : UDType = () : DimensionProps => {
 }
 
 export interface CustomStyleProps {
-    barStyle : (i : number) => CSSProperties
+    barStyle : (i : number) => CSSProperties,
+    parentStyle : () => CSSProperties
 }
 
 export type USType = (a : number, b : number, c : number, d : number) => CustomStyleProps 
@@ -76,7 +77,17 @@ export const useStyle : USType = (w : number, h : number, scale : number, n : nu
     const sf : number = Math.min(scale * Math.PI)
     const size : number = Math.min(w, h) / 10
     const background : string = "#42a5f5"
+    const position = 'absolute'
     return {
+        parentStyle() : CSSProperties {
+            const top = `${h / 2}px`
+            const left = `${w / 2}px`
+            return {
+                position, 
+                top, 
+                left 
+            }
+        },
         barStyle(i : number) : CSSProperties {
             const top : string = `${size * n * 0.5 - i * size * 0.5}px`
             const left : string = `${(w - size) * sf}px`
@@ -87,7 +98,8 @@ export const useStyle : USType = (w : number, h : number, scale : number, n : nu
                 width, 
                 height, 
                 top, 
-                left 
+                left,
+                position
             }
         }
     }
