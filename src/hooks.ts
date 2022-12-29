@@ -4,7 +4,10 @@ export interface AnimatedScaleProps {
     scale : number, 
     start : () => void 
 }
-export const useAnimatedScale = (scGap : number = 0.01, delay : number = 20, n : number = 4) : AnimatedScaleProps => {
+
+type UASProps = (a : number, b : number, c : number) => AnimatedScaleProps 
+
+export const useAnimatedScale : UASProps = (scGap : number = 0.01, delay : number = 20, n : number = 4) : AnimatedScaleProps => {
     const [scale, setScale] = useState<number>(0)
     const [animated, setAnimated] = useState<boolean>(false)
     const [i, setI] = useState<number>(0)
@@ -38,5 +41,21 @@ export const useAnimatedScale = (scGap : number = 0.01, delay : number = 20, n :
                 }, delay)
             }
         }
+    }
+}
+
+export interface DimensionProps {
+    w : number, 
+    h : number 
+}
+
+export type UDType = () => DimensionProps
+
+export const useDimension : UDType = () : DimensionProps => {
+    const [w, setW] = useState<number>(window.innerWidth)
+    const [h, setH] = useState<number>(window.innerHeight)
+    return {
+        w, 
+        h
     }
 }
